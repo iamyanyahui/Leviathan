@@ -1,0 +1,9 @@
+/usr/lib/python2.7/dist-packages/pkg_resources.py:1031: UserWarning: /home/ubuntu/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+  warnings.warn(msg, UserWarning)
+/usr/lib/python2.7/dist-packages/pkg_resources.py:1031: UserWarning: /home/ubuntu/.python-eggs is writable by group/others and vulnerable to attack when used with get_resource_filename. Consider a more secure location (set with .set_extraction_path or the PYTHON_EGG_CACHE environment variable).
+  warnings.warn(msg, UserWarning)
+Not Found: /
+[10/Nov/2016 22:31:17] "GET / HTTP/1.1" 404 2020
+[10/Nov/2016 22:31:23] "GET /preview/ HTTP/1.1" 200 23
+[10/Nov/2016 22:31:24] "GET /preview/ HTTP/1.1" 200 23
+[10/Nov/2016 22:31:38] "GET /preview/ HTTP/1.1" 200 23
