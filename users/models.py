@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-import datetime
 
 from django.db import models
 
@@ -25,8 +24,8 @@ from django.db import models
 
 class Patient(models.Model):
     id_patient = models.AutoField(null=False, primary_key=True, max_length=11)
-    username = models.CharField(null=False, max_length=15, help_text='用户名，用于登陆')
-    password = models.CharField(null=False, max_length=32)
+    username = models.CharField(null=False, unique=True,max_length=15, help_text='用户名，用于登陆')
+    password = models.CharField(null=False, max_length=32,)
     telephone = models.CharField(null=False, blank=True, max_length=15, help_text='选填，用于备案')
     email = models.EmailField(help_text='选填，用于备案', max_length=15)
     name = models.CharField(null=False, max_length=45, help_text='认证实名')
@@ -44,7 +43,7 @@ class Patient(models.Model):
     )
     gender = models.CharField(null=False, choices=GENDER, max_length=1)
     age = models.IntegerField(null=False, default=0)
-    _createtime = models.CharField(help_text='注册时间', max_length=20)
+    _createtime = models.CharField(help_text='注册时间', max_length=100)
 
     # change table name, remove prefix 'users'
     class Meta:
