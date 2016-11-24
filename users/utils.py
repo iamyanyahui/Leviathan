@@ -4,6 +4,7 @@ from forms import RegisterForm, LoginForm
 from django.db import models
 from . import models
 import datetime
+from django.contrib.auth.models import User
 
 
 def addUser(form):
@@ -14,6 +15,9 @@ def addUser(form):
                                             age=data['age']
                                             , _createtime=datetime.datetime.now(), idcardnumber=data['idcardnumber'])
     patient.save()
+    user = User.objects.create_user(form.cleaned_data['username'], form.cleaned_data['email'],
+                                    form.cleaned_data['password'])
+    user.save()
 
 
 def authUser(form):
