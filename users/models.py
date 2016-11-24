@@ -10,19 +10,19 @@ class Patient(models.Model):
     username = models.CharField(null=False, unique=True, max_length=15, help_text='用户名，用于登陆')
     password = models.CharField(null=False, max_length=32, )
     telephone = models.CharField(null=False, blank=True, max_length=15, help_text='选填，用于备案')
-    email = models.EmailField(help_text='选填，用于备案', max_length=50)
+    email = models.EmailField(help_text='选填，用于备案', max_length=50,blank=True)
     name = models.CharField(null=False, max_length=45, help_text='认证实名')
     CREDIT_LEVEL = (
-        (3, 'A'),
-        (2, 'B'),
-        (1, 'C'),
-        (0, 'X')
+        ('A', 'A'),
+        ('B', 'B'),
+        ('C', 'C'),
+        ('X', 'X')
     )
     credit = models.CharField(null=False, choices=CREDIT_LEVEL, help_text='信用额度', max_length=1)
     idcardnumber = models.CharField(null=False, max_length=18, unique=True, help_text='身份证号定长18位')
     GENDER = (
-        (0, '男'),
-        (1, '女')
+        ('男', '男'),
+        ('女', '女')
     )
     gender = models.CharField(null=False, choices=GENDER, max_length=1)
     age = models.IntegerField(null=False, default=0)
@@ -36,16 +36,22 @@ class Patient(models.Model):
     def __str__(self):
         return 'username: %s id: %s' % (self.username, self.id_patient)
 
+    def __unicode__(self):
+        return u'username: %s id: %s' % (self.username, self.id_patient)
+
 
 class Location(models.Model):
     id_location = models.AutoField(null=False, primary_key=True, max_length=11)
-    province = models.CharField(null=True, max_length=20, help_text='省/自治区(直辖市和特别行政区留白')
+    province = models.CharField(null=True, max_length=20, help_text='省/自治区(直辖市和特别行政区留白',blank=True)
     city = models.CharField(null=False, max_length=20, help_text='市')
     county = models.CharField(null=False, max_length=20, help_text='主城区/县')
-    street = models.CharField(null=True, max_length=50, help_text='街道地址门牌号')
+    street = models.CharField(null=True, max_length=50, help_text='街道地址门牌号',blank=True)
 
     def __str__(self):
         return 'province: %s  city: %s  street: %s' % (self.province, self.city, self.street)
+
+    def __unicode__(self):
+        return u'province: %s  city: %s  street: %s' % (self.province, self.city, self.street)
 
     class Meta:
         db_table = 'location'
@@ -53,25 +59,27 @@ class Location(models.Model):
 
 class Hospital(models.Model):
     id_hospital = models.AutoField(null=False, primary_key=True, max_length=11)
-    # todo
     id_location = models.ForeignKey(Location, to_field='id_location', on_delete=models.CASCADE)
     name = models.CharField(null=False, max_length=45)
     LEVEL = (
-        (0, '一级丙等'), (1, '一级乙等'), (2, '一级甲等'), (3, '二级丙等'), (4, '二级乙等'),
-        (5, '二级甲等'), (6, '三级丙等'), (7, '三级乙等'), (8, '三级甲等'), (9, '三级特等')
+        ('一级丙等', '一级丙等'), ('一级乙等', '一级乙等'), ('一级甲等', '一级甲等'), ('二级丙等', '二级丙等'), ('二级乙等', '二级乙等'),
+        ('二级甲等', '二级甲等'), ('三级丙等', '三级丙等'), ('三级乙等', '三级乙等'), ('三级甲等', '三级甲等'), ('三级特等', '三级特等')
     )
     level = models.CharField(null=False, choices=LEVEL, max_length=20)
     TYPE = (
-        (0, '普通'), (1, '专科')
+        ('普通', '普通'), ('专科', '专科')
     )
-    type = models.CharField(null=True, choices=TYPE, max_length=20, help_text='医疗服务是否专科')
-    information = models.TextField()
-    telephone = models.CharField(null=True, max_length=15)
-    picture = models.CharField(null=True, max_length=90, help_text='医院照片，存路径')
+    type = models.CharField(null=True, choices=TYPE, max_length=20, help_text='医疗服务是否专科',blank=True)
+    information = models.TextField(blank=True)
+    telephone = models.CharField(null=True, max_length=15,blank=True)
+    picture = models.CharField(null=True, max_length=90, help_text='医院照片，存路径',blank=True)
     _createtime = models.CharField(max_length=100)
 
     def __str__(self):
         return ': %s  level: %s' % (self.name, self.level)
+
+    def __unicode__(self):
+        return u': %s  level: %s' % (self.name, self.level)
 
     class Meta:
         db_table = 'hospital'
@@ -81,16 +89,16 @@ class Doctor(models.Model):
     id_doctor = models.AutoField(null=False, primary_key=True, max_length=11)
     name = models.CharField(null=False, help_text='医生实名', max_length=45)
     LEVEL = (
-        (0, '主任医师'), (1, '副主任医师'), (2, '主治医师'), (3, '住院医师')
+        ('主任医师', '主任医师'), ('副主任医师', '副主任医师'), ('主治医师', '主治医师'), ('住院医师', '住院医师')
     )
     level = models.CharField(null=False, choices=LEVEL, max_length=10)
-    information = models.TextField(blank=True)
-    picture = models.CharField(null=True, max_length=90, help_text='医生照片，存路径')
-    speciality = models.CharField(null=True, max_length=90, help_text='主治特长')
+    information = models.TextField(null=True,blank=True)
+    picture = models.CharField(null=True, max_length=90, help_text='医生照片，存路径',blank=True)
+    speciality = models.CharField(null=True, max_length=90, help_text='主治特长',blank=True)
     careertime = models.IntegerField(null=False, default=0, help_text='医龄，单位为年')
     GENDER = (
-        (0, '男'),
-        (1, '女')
+        ('男', '男'),
+        ('女', '女')
     )
     gender = models.CharField(null=False, choices=GENDER, max_length=10)
     age = models.IntegerField(null=False, default=0)
@@ -102,12 +110,15 @@ class Doctor(models.Model):
     def __str__(self):
         return 'doctor name: %s' % self.name
 
+    def __unicode__(self):
+        return u'doctor name: %s' % self.name
+
 
 class Department(models.Model):
     id_department = models.AutoField(null=False, primary_key=True, max_length=11)
     id_hospital = models.ForeignKey(Hospital, to_field='id_hospital', on_delete=models.CASCADE)
     name = models.CharField(null=False, max_length=45)
-    telephone = models.CharField(max_length=15, null=True)
+    telephone = models.CharField(max_length=15, null=True,blank=True)
     information = models.TextField(null=True, blank=True, help_text='概述')
 
     class Meta:
@@ -115,6 +126,9 @@ class Department(models.Model):
 
     def __str__(self):
         return 'department name: %s' % self.name
+
+    def __unicode__(self):
+        return u'department name: %s' % self.name
 
 
 class DoctorDepartment(models.Model):
@@ -127,6 +141,10 @@ class DoctorDepartment(models.Model):
 
     def __str__(self):
         return 'doctor id: %s     department id: %s' % (self.id_doctor, self.id_department)
+
+    def __unicode__(self):
+        return u'doctor id: %s     department id: %s' % (self.id_doctor, self.id_department)
+
 
 class Adminreceptor(models.Model):
     id_adminreceptor=models.AutoField(null=False, primary_key=True, max_length=11)
@@ -141,14 +159,17 @@ class Adminreceptor(models.Model):
     def __str__(self):
         return 'Adminreceptor  loginname: %s' % self.loginname
 
+    def __unicode__(self):
+        return u'Adminreceptor  loginname: %s' % self.loginname
+
 
 class Adminpublisher(models.Model):
     id_adminpublisher=models.AutoField(null=False, primary_key=True, max_length=11)
     id_hospital=models.ForeignKey(Hospital,to_field='id_hospital')
     loginname = models.CharField(max_length=45, null=False, unique=True,help_text='登陆标识符，实际可为自定义用户名或被注册受理方给定的用户名')
     password = models.CharField(max_length=32, null=False)
-    telephone=models.CharField(max_length=15,null=True,help_text='或许用于备案存档的信息')
-    email = models.EmailField(help_text='选填，用于备案', max_length=50,null=True)
+    telephone=models.CharField(max_length=15,null=True,help_text='或许用于备案存档的信息',blank=True)
+    email = models.EmailField(help_text='选填，用于备案', max_length=50,null=True,blank=True)
     _createtime = models.CharField(max_length=100,help_text='注册事件')
 
     class Meta:
@@ -156,6 +177,9 @@ class Adminpublisher(models.Model):
 
     def __str__(self):
         return 'adminpublisher loginname: %s' % self.loginname
+
+    def __unicode__(self):
+        return u'adminpublisher loginname: %s' % self.loginname
 
 
 class Bulletin(models.Model):
@@ -174,6 +198,9 @@ class Bulletin(models.Model):
     def __str__(self):
         return 'bulletin id: %s' % self.id_bulletin
 
+    def __unicode__(self):
+        return u'bulletin id: %s' % self.id_bulletin
+
 
 class Appointment(models.Model):
     id_appointment=models.AutoField(null=False, primary_key=True, max_length=11)
@@ -189,3 +216,6 @@ class Appointment(models.Model):
 
     def __str__(self):
         return 'appointment id: %s' % self.id_appointment
+
+    def __unicode__(self):
+        return u'appointment id: %s' % self.id_appointment
