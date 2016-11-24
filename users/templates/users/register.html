@@ -14,7 +14,7 @@
         </table>
         {% csrf_token %}
         <input type="submit" value="提交"></br>
-        <a href="/users/register">没有账户?</a>
+        <a href="{% url 'login' %}">已有账号？立即登录</a>
     </form>
 </body>
 </html>
