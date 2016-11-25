@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <title>医院信息</title>
@@ -11,6 +11,14 @@
     {% else %}
         <a href="{%  url 'login' %}">登录</a></br>
     {% endif %}
-    {{ hospital.name }}
+    {{ hospital.name }} </br>
+    {{ hospital.level }} </br>
+    {{ hospital.telephone }} </br>
+    {{ hospital.information }} </br>
+    {{ location.province }} </br>
+    {{ location.city }} </br>
+    {{ location.street }} </br>
+
+
 </body>
 </html>

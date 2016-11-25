@@ -51,7 +51,3 @@ def getCities(province):
     for province in provinces:
         cities.append(province.city)
     return cities
-
-
-def getHospital(id):
-    return my_models.Hospital.objects.filter(id_hospital=id).first()

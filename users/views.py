@@ -3,7 +3,10 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from forms import RegisterForm, LoginForm
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
+
+from . import models
 from . import utils
 
 provinces = ['河北', '陕西', '辽宁', '吉林', '黑龙江', '江苏', '浙江', '安徽', '福建', '江西', '山东', '河南', '湖北', '湖南', '广东'
@@ -11,6 +14,7 @@ provinces = ['河北', '陕西', '辽宁', '吉林', '黑龙江', '江苏', '浙
 provinces.sort()
 
 #在需要鉴别用户身份的地方，调用request.user.is_authenticated()判断即可
+#需要用户登录才能访问的页面，请添加header @login_required(login_url='login'),参见test
 # Create your views here.
 def index(request):
     province = request.GET.get('province', None)
@@ -25,7 +29,6 @@ def index(request):
            , 'cities': cities, 'hospitals': hospitals})
 
 
-
 def login(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -38,6 +41,9 @@ def login(request):
         if user is not None:
             if user.is_active:
                 auth_login(request, user)
+                next=request.GET.get('next',None)
+                if next:
+                    return redirect(next)
                 return redirect('/users')
             else:
                 return HttpResponse('您的账户已被禁用')
@@ -74,4 +80,11 @@ def register(request):
 
 def hospital(request):
     hospital_id = request.GET.get('hospital_id', None)
-    return render(request, 'users/hospital.html', {'username': request.user.username,'hospital': utils.getHospital(hospital_id)})
+    find=models.Hospital.objects.filter(id_hospital=hospital_id).first()
+    location=models.Location.objects.filter(id_location=find.id_location.id_location).first()
+    return render(request, 'users/hospital.html', {'username': request.user.username,'hospital':find ,'location':location})
+
+
+@login_required(login_url='login')
+def test(request):
+    return HttpResponse('Test page')
