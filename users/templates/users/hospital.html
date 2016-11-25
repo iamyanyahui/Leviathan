@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>医院信息</title>
+</head>
+<body>
+    {% if username %}
+         你好，{{ username }}
+        <a href="{% url 'logout' %}">注销</a></br>
+    {% else %}
+        <a href="{%  url 'login' %}">登录</a></br>
+    {% endif %}
+    {{ hospital.name }}
+</body>
+</html>

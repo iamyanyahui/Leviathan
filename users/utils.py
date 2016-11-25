@@ -2,7 +2,7 @@
 # 功能函数放置在此文件中
 from forms import RegisterForm, LoginForm
 from django.db import models
-from . import models
+from . import models as my_models
 import datetime
 from django.contrib.auth.models import User
 
@@ -33,3 +33,25 @@ def authUser(form):
             return False
     else:
         return False
+
+
+def getHospitals(city):
+    locations=my_models.Location.objects.filter(city__contains=city)
+    hospitals = []
+    for location in locations:
+        find=my_models.Hospital.objects.filter(id_location=location.id_location)
+        for hospital in find:
+            hospitals.append(hospital)
+    return hospitals
+
+
+def getCities(province):
+    provinces=my_models.Location.objects.filter(province__contains=province)
+    cities=[]
+    for province in provinces:
+        cities.append(province.city)
+    return cities
+
+
+def getHospital(id):
+    return my_models.Hospital.objects.filter(id_hospital=id).first()
