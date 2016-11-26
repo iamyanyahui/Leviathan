@@ -22,23 +22,41 @@
     <img src="{% static hospital.picture %}"/>
 {% endif %}
 
-{% if bulletins %}
+{% if items %}
     <table>
         <tr>
+            <td>医生</td>
+            <td>科室</td>
+            <td>等级</td>
             <td>预约时间</td>
             <td>可预约数量</td>
             <td>已预约数量</td>
             <td>预约费用</td>
+            <td>预约</td>
         </tr>
-        {% for bulletin in bulletins %}
-            <tr>
-                <td>{{ bulletin.availabletime }}</td>
-                <td>{{ bulletin.countavailable }}</td>
-                <td>{{ bulletin.countoccupied }}</td>
-                <td>{{ bulletin.fee }}</td>
+    {% for item in items%}
+             <tr>
+                <td><a href="{% url 'doctor' %}?doctor_id={{ item.doctor.id_doctor }}&bullet_id={{ item.bulletin.id_bulletin }}&department_id={{ item.department.id_department }}">{{ item.doctor.name }}</a></td>
+                <td>{{ item.department.name }}</td>
+                <td>{{ item.doctor.level }}</td>
+                <td>{{ item.bulletin.availabletime }}</td>
+                <td>{{ item.bulletin.countavailable }}</td>
+                <td>{{ item.bulletin.countoccupied }}</td>
+                <td>{{ item.bulletin.fee }}</td>
+                 {% if username %}
+                     {% if item.bulletin.countavailable > item.bulletin.countoccupied %}
+                         <td><a href="{% url 'reservation' %}?doctor_id={{ item.doctor.id_doctor }}">点击预约</a></td>
+                         {% else %}
+                         <td>名额已满，无法预约</td>
+                         {% endif %}
+                {% else %}
+                <td><a href="{% url 'login' %}">登录</a></td>
+                {% endif %}
             </tr>
-        {% endfor %}
+    {% endfor %}
     </table>
+    {% else %}
+    当前没有可以预约的医生
 {% endif %}
 </body>
 </html>

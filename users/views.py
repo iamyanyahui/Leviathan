@@ -79,16 +79,51 @@ def register(request):
         return render(request, 'users/register.html', {'form': form})
 
 
+class Item:
+    doctor=None
+    bulletin=None
+    department=None
+
+    def __init__(self,doctor,bulletin,department):
+        self.doctor=doctor
+        self.bulletin=bulletin
+        self.department=department
+
+
 def hospital(request):
     hospital_id = request.GET.get('hospital_id', None)
     find = models.Hospital.objects.filter(id_hospital=hospital_id).first()
     location = models.Location.objects.filter(id_location=find.id_location.id_location).first()
-    #获取路由信息
     bulletins=utils.getBulletins(hospital_id)
+    doctors=utils.getDoctors(bulletins)
+    departments = utils.getDepartments(doctors)
+    items=[]
+    for i in range(len(bulletins)):
+        item=Item(doctor=doctors[i],bulletin=bulletins[i],department=departments[i])
+        items.append(item)
     return render(request, 'users/hospital.html',
-                  {'username': request.user.username, 'hospital': find, 'location': location,'bulletins':bulletins})
+                  {'username': request.user.username, 'hospital': find, 'location': location,'items':items})
 
 
 @login_required(login_url='login')
 def test(request):
     return HttpResponse('Test page')
+
+
+def doctor(request):
+    doctor_id=request.GET.get('doctor_id',1)
+    bulletin_id=request.GET.get('bulletin_id',1)
+    department_id=request.GET.get('department_id',1)
+    doctor=models.Doctor.objects.filter(id_doctor=doctor_id).first()
+    bulletin=models.Bulletin.objects.filter(id_bulletin=bulletin_id).first()
+    department=models.Department.objects.filter(id_department=department_id).first()
+    return render(request,'users/doctor.html',{'username':request.user.username,'doctor':doctor,'bulletin':bulletin,'department':department})
+
+
+@login_required(login_url='login')
+def reservation(request):
+    doctor_id=request.GET.get('doctor_id',1)
+    if utils.addAppointment(doctor_id,request.user.username):
+        return HttpResponse('预约成功')
+    else:
+        return HttpResponse('预约失败')

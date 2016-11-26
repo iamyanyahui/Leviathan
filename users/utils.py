@@ -58,9 +58,32 @@ def getBulletins(hospital_id):
     departments=my_models.Department.objects.filter(id_hospital=hospital_id)
     bulletins=[]
     for department in departments:
-        doctor_department=my_models.DoctorDepartment.objects.filter(id_department=department.id_department).first()
-        finds=my_models.Bulletin.objects.filter(id_doctor_department=doctor_department.id_doctor_department)
-        for find in finds:
-            if find.availabletime > pytz.utc.localize(datetime.datetime.now()):
-                bulletins.append(find)
+        doctor_departments=my_models.DoctorDepartment.objects.filter(id_department=department.id_department)
+        for doctor_department in doctor_departments:
+            finds = my_models.Bulletin.objects.filter(id_doctor_department=doctor_department.id_doctor_department)
+            for find in finds:
+                if find.availabletime > pytz.utc.localize(datetime.datetime.now()):
+                    bulletins.append(find)
     return bulletins
+
+
+def getDoctors(bulletins):
+    doctors=[]
+    for bulletin in bulletins:
+        doctor_department=my_models.DoctorDepartment.objects.filter(id_doctor_department=bulletin.id_doctor_department.id_doctor_department).first()
+        doctor=my_models.Doctor.objects.filter(id_doctor=doctor_department.id_doctor.id_doctor).first()
+        doctors.append(doctor)
+    return doctors
+
+
+def getDepartments(doctors):
+    departments=[]
+    for doctor in doctors:
+        doctor_department=my_models.DoctorDepartment.objects.filter(id_doctor=doctor.id_doctor).first()
+        department=my_models.Department.objects.filter(id_department=doctor_department.id_department.id_department).first()
+        departments.append(department)
+    return departments
+
+
+def addAppointment(doctor_id,username):
+    pass

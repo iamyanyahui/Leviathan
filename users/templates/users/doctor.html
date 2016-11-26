@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>医生信息</title>
+</head>
+<body>
+{% if username %}
+    你好，{{ username }}
+    <a href="{% url 'logout' %}">注销</a></br>
+{% else %}
+    <a href="{% url 'login' %}">登录</a></br>
+{% endif %}
+{% if doctor %}
+    {% if doctor.picture %}
+        {% load static %}
+        <img src="{% static doctor.picture %}"/></br>
+        {% endif %}
+    {{ doctor.name }} </br>
+    {{ doctor.gender }}
+    {{ doctor.level }} </br>
+    从医时间: {{ doctor.careertime}} 年</br>
+    个人信息: {{ doctor.information }} </br>
+{% endif %}
+</body>
+</html>
