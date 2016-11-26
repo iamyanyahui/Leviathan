@@ -4,6 +4,7 @@ from forms import RegisterForm, LoginForm
 from django.db import models
 from . import models as my_models
 import datetime
+import pytz
 from django.contrib.auth.models import User
 
 
@@ -51,3 +52,15 @@ def getCities(province):
     for province in provinces:
         cities.append(province.city)
     return cities
+
+
+def getBulletins(hospital_id):
+    departments=my_models.Department.objects.filter(id_hospital=hospital_id)
+    bulletins=[]
+    for department in departments:
+        doctor_department=my_models.DoctorDepartment.objects.filter(id_department=department.id_department).first()
+        finds=my_models.Bulletin.objects.filter(id_doctor_department=doctor_department.id_doctor_department)
+        for find in finds:
+            if find.availabletime > pytz.utc.localize(datetime.datetime.now()):
+                bulletins.append(find)
+    return bulletins

@@ -5,20 +5,40 @@
     <title>医院信息</title>
 </head>
 <body>
-    {% if username %}
-         你好，{{ username }}
-        <a href="{% url 'logout' %}">注销</a></br>
-    {% else %}
-        <a href="{%  url 'login' %}">登录</a></br>
-    {% endif %}
-    {{ hospital.name }} </br>
-    {{ hospital.level }} </br>
-    {{ hospital.telephone }} </br>
-    {{ hospital.information }} </br>
-    {{ location.province }} </br>
-    {{ location.city }} </br>
-    {{ location.street }} </br>
+{% if username %}
+    你好，{{ username }}
+    <a href="{% url 'logout' %}">注销</a></br>
+{% else %}
+    <a href="{% url 'login' %}">登录</a></br>
+{% endif %}
+{{ hospital.name }} </br>
+{{ hospital.level }} </br>
+电话:{{ hospital.telephone }} </br>
+{{ hospital.information }} </br>
+地址:{{ location.province }} {{ location.city }} {{ location.street }} </br>
 
+{% if hospital.picture %}
+    {% load static %}
+    <img src="{% static hospital.picture %}"/>
+{% endif %}
 
+{% if bulletins %}
+    <table>
+        <tr>
+            <td>预约时间</td>
+            <td>可预约数量</td>
+            <td>已预约数量</td>
+            <td>预约费用</td>
+        </tr>
+        {% for bulletin in bulletins %}
+            <tr>
+                <td>{{ bulletin.availabletime }}</td>
+                <td>{{ bulletin.countavailable }}</td>
+                <td>{{ bulletin.countoccupied }}</td>
+                <td>{{ bulletin.fee }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endif %}
 </body>
 </html>

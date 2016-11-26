@@ -13,8 +13,9 @@ provinces = ['河北', '陕西', '辽宁', '吉林', '黑龙江', '江苏', '浙
     , '海南', '四川', '贵州', '云南', '陕西', '甘肃', '青海', '北京', '天津', '上海', '重庆', '内蒙古', '广西', '宁夏', '新疆', '西藏']
 provinces.sort()
 
-#在需要鉴别用户身份的地方，调用request.user.is_authenticated()判断即可
-#需要用户登录才能访问的页面，请添加header @login_required(login_url='login'),参见test
+
+# 在需要鉴别用户身份的地方，调用request.user.is_authenticated()判断即可
+# 需要用户登录才能访问的页面，请添加header @login_required(login_url='login'),参见test
 # Create your views here.
 def index(request):
     province = request.GET.get('province', None)
@@ -26,7 +27,7 @@ def index(request):
     elif province:
         cities = utils.getCities(province)
     return render(request, 'users/index.html', {'username': request.user.username, 'provinces': provinces
-           , 'cities': cities, 'hospitals': hospitals})
+        , 'cities': cities, 'hospitals': hospitals})
 
 
 def login(request):
@@ -41,7 +42,7 @@ def login(request):
         if user is not None:
             if user.is_active:
                 auth_login(request, user)
-                next=request.GET.get('next',None)
+                next = request.GET.get('next', None)
                 if next:
                     return redirect(next)
                 return redirect('/users')
@@ -80,9 +81,12 @@ def register(request):
 
 def hospital(request):
     hospital_id = request.GET.get('hospital_id', None)
-    find=models.Hospital.objects.filter(id_hospital=hospital_id).first()
-    location=models.Location.objects.filter(id_location=find.id_location.id_location).first()
-    return render(request, 'users/hospital.html', {'username': request.user.username,'hospital':find ,'location':location})
+    find = models.Hospital.objects.filter(id_hospital=hospital_id).first()
+    location = models.Location.objects.filter(id_location=find.id_location.id_location).first()
+    #获取路由信息
+    bulletins=utils.getBulletins(hospital_id)
+    return render(request, 'users/hospital.html',
+                  {'username': request.user.username, 'hospital': find, 'location': location,'bulletins':bulletins})
 
 
 @login_required(login_url='login')

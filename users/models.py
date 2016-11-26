@@ -26,7 +26,7 @@ class Patient(models.Model):
     )
     gender = models.CharField(null=False, choices=GENDER, max_length=1)
     age = models.IntegerField(null=False, default=0)
-    _createtime = models.CharField(help_text='注册时间', max_length=100)
+    createtime = models.DateTimeField(help_text='注册时间', max_length=100,null=True,blank=True)
 
     # change table name, remove prefix 'users'
     class Meta:
@@ -69,11 +69,11 @@ class Hospital(models.Model):
     TYPE = (
         ('普通', '普通'), ('专科', '专科')
     )
-    type = models.CharField(null=True, choices=TYPE, max_length=20, help_text='医疗服务是否专科',blank=True)
-    information = models.TextField(blank=True)
+    type = models.CharField(null=True, choices=TYPE, max_length=20, help_text='医疗服务是否专科',blank=True,default='普通')
+    information = models.TextField(blank=True,default='无说明信息')
     telephone = models.CharField(null=True, max_length=15,blank=True)
     picture = models.CharField(null=True, max_length=90, help_text='医院照片，存路径',blank=True)
-    _createtime = models.CharField(max_length=100)
+    createtime = models.DateTimeField(null=True,blank=True)
 
     def __str__(self):
         return ': %s  level: %s' % (self.name, self.level)
@@ -102,7 +102,7 @@ class Doctor(models.Model):
     )
     gender = models.CharField(null=False, choices=GENDER, max_length=10)
     age = models.IntegerField(null=False, default=0)
-    _createtime = models.CharField(max_length=100, help_text='生成时间')
+    createtime = models.DateTimeField( help_text='生成时间',null=True,blank=True)
 
     class Meta:
         db_table = 'doctor'
@@ -137,7 +137,7 @@ class DoctorDepartment(models.Model):
     id_department = models.ForeignKey(Department, to_field='id_department', null=False,db_column='id_department')
 
     class Meta:
-        db_table = '_doctor_department'
+        db_table = 'doctor_department'
 
     def __str__(self):
         return 'doctor id: %s     department id: %s' % (self.id_doctor, self.id_department)
@@ -151,7 +151,7 @@ class Adminreceptor(models.Model):
     id_hospital=models.ForeignKey(Hospital,to_field='id_hospital',db_column='id_hospital')
     loginname=models.CharField(max_length=45,null=False,unique=True,help_text='登陆标识符，实际可为自定义用户名或院方定义的用户名(比如工号)')
     password=models.CharField(max_length=32,null=False)
-    _createtime=models.CharField(max_length=100)
+    createtime=models.DateTimeField(null=True,blank=True)
 
     class Meta:
         db_table='adminreceptor'
@@ -170,7 +170,7 @@ class Adminpublisher(models.Model):
     password = models.CharField(max_length=32, null=False)
     telephone=models.CharField(max_length=15,null=True,help_text='或许用于备案存档的信息',blank=True)
     email = models.EmailField(help_text='选填，用于备案', max_length=50,null=True,blank=True)
-    _createtime = models.CharField(max_length=100,help_text='注册事件')
+    createtime = models.DateTimeField(help_text='注册事件',null=True,blank=True)
 
     class Meta:
         db_table='adminpublisher'
@@ -190,7 +190,7 @@ class Bulletin(models.Model):
     fee=models.FloatField(null=False,default=0,help_text='(预约)挂号费')
     countavailable=models.IntegerField(null=False,help_text='初始声明的可预约数量')
     countoccupied=models.IntegerField(null=False,help_text='已预约数量')
-    _createtime = models.CharField(max_length=100, help_text='最后一次新增预约记录的时间')
+    createtime = models.DateTimeField(help_text='最后一次新增预约记录的时间',null=True,blank=True)
 
     class Meta:
         db_table='bulletin'
@@ -208,8 +208,8 @@ class Appointment(models.Model):
     id_bulletin=models.ForeignKey(Bulletin,to_field='id_bulletin',help_text='分诊台操作员从这里取得预约信息',db_column='id_bulletin')
     id_adminreceptor=models.ForeignKey(Adminreceptor,to_field='id_adminreceptor',db_column='id_adminreceptor')
     ispaid=models.BooleanField(null=False,default=False)
-    registrationtime=models.CharField(max_length=100, help_text='到院取号时间-此项说明了是否爽约')
-    _createtime = models.CharField(max_length=100, help_text='预约单生成时间')
+    registrationtime=models.DateTimeField(help_text='到院取号时间-此项说明了是否爽约')
+    createtime = models.DateTimeField(help_text='预约单生成时间',null=False)
 
     class Meta:
         db_table='appointment'
