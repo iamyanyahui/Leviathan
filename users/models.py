@@ -206,8 +206,7 @@ class Appointment(models.Model):
     id_appointment=models.AutoField(null=False, primary_key=True, max_length=11)
     id_patient=models.ForeignKey(Patient,to_field='id_patient',db_column='id_patient')
     id_bulletin=models.ForeignKey(Bulletin,to_field='id_bulletin',help_text='分诊台操作员从这里取得预约信息',db_column='id_bulletin')
-    id_adminreceptor=models.ForeignKey(Adminreceptor,to_field='id_adminreceptor',db_column='id_adminreceptor')
-    ispaid=models.BooleanField(null=False,default=False)
+    ispaid=models.BooleanField(null=False,default='0')
     registrationtime=models.DateTimeField(help_text='到院取号时间-此项说明了是否爽约',null=True,blank=True)
     createtime = models.DateTimeField(help_text='预约单生成时间',null=False)
 

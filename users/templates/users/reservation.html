@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>预约</title>
+</head>
+<body>
+ <a href="{% url 'logout' %}">注销</a></br>
+医生姓名:{{ doctor.name }} </br>
+医生评级:{{ doctor.level }} </br>
+科室:{{ department.name }} </br>
+预约时间:{{ bulletin.availabletime }} </br>
+预约费用:{{ bulletin.fee }} </br>
+
+<form method="post" action="" >
+    <input type="submit" value="预约">
+    {% csrf_token %}
+</form>
+
+</body>
+</html>

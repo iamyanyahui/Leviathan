@@ -117,13 +117,22 @@ def doctor(request):
     doctor=models.Doctor.objects.filter(id_doctor=doctor_id).first()
     bulletin=models.Bulletin.objects.filter(id_bulletin=bulletin_id).first()
     department=models.Department.objects.filter(id_department=department_id).first()
-    return render(request,'users/doctor.html',{'username':request.user.username,'doctor':doctor,'bulletin':bulletin,'department':department})
+    return render(request,'users/doctor.html',{'username':request.user.username,'doctor':doctor,'bulletin':bulletin
+        ,'department':department})
 
 
 @login_required(login_url='login')
 def reservation(request):
-    doctor_id=request.GET.get('doctor_id',1)
-    if utils.addAppointment(doctor_id,request.user.username):
-        return HttpResponse('预约成功')
-    else:
-        return HttpResponse('预约失败')
+    doctor_id = request.GET.get('doctor_id', 1)
+    bulletin_id = request.GET.get('bulletin_id', 1)
+    department_id = request.GET.get('department_id', 1)
+    doctor = models.Doctor.objects.filter(id_doctor=doctor_id).first()
+    bulletin = models.Bulletin.objects.filter(id_bulletin=bulletin_id).first()
+    department = models.Department.objects.filter(id_department=department_id).first()
+    if request.method=='POST':
+        if utils.addAppointment(bulletin,request.user.username):
+            return HttpResponse('预约成功')
+        else:
+            return HttpResponse('您已成功预约，无需重复预约')
+    return render(request,'users/reservation.html',{'username':request.user.username
+        ,'doctor':doctor,'bulletin':bulletin,'department':department})

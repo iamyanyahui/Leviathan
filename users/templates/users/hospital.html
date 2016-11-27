@@ -45,7 +45,7 @@
                 <td>{{ item.bulletin.fee }}</td>
                  {% if username %}
                      {% if item.bulletin.countavailable > item.bulletin.countoccupied %}
-                         <td><a href="{% url 'reservation' %}?doctor_id={{ item.doctor.id_doctor }}">点击预约</a></td>
+                         <td><a href="{% url 'reservation' %}?doctor_id={{ item.doctor.id_doctor }}&bulletin_id={{ item.bulletin.id_bulletin }}&department_id={{ item.department.id_department }}">点击预约</a></td>
                          {% else %}
                          <td>名额已满，无法预约</td>
                          {% endif %}
