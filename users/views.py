@@ -58,7 +58,7 @@ def login(request):
 
 def logout(request):
     auth_logout(request)
-    return HttpResponse('注销成功')
+    return render(request,'users/logout.html')
 
 
 def register(request):
