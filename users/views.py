@@ -39,6 +39,7 @@ def login(request):
         username = form.cleaned_data['username']
         password = form.cleaned_data['password']
         user = authenticate(username=username, password=password)
+
         if user is not None:
             if user.is_active:
                 auth_login(request, user)
@@ -90,19 +91,29 @@ class Item:
         self.department=department
 
 
+def department(request):
+    return HttpResponse('department')
+
+
 def hospital(request):
     hospital_id = request.GET.get('hospital_id', None)
-    find = models.Hospital.objects.filter(id_hospital=hospital_id).first()
-    location = models.Location.objects.filter(id_location=find.id_location.id_location).first()
-    bulletins=utils.getBulletins(hospital_id)
-    doctors=utils.getDoctors(bulletins)
-    departments = utils.getDepartments(doctors)
-    items=[]
-    for i in range(len(bulletins)):
-        item=Item(doctor=doctors[i],bulletin=bulletins[i],department=departments[i])
-        items.append(item)
-    return render(request, 'users/hospital.html',
-                  {'username': request.user.username, 'hospital': find, 'location': location,'items':items})
+    department_id=request.GET.get('department_id',None)
+    hospital = models.Hospital.objects.filter(id_hospital=hospital_id).first()
+    departments = models.Department.objects.filter(id_hospital=hospital_id)
+    if department_id:
+        location = models.Location.objects.filter(id_location=hospital.id_location.id_location).first()
+        bulletins=utils.getBulletins(department_id)
+        doctors=utils.getDoctors(bulletins)
+        department=models.Department.objects.filter(id_department=department_id).first()
+        items=[]
+        for i in range(len(bulletins)):
+            item=Item(doctor=doctors[i],bulletin=bulletins[i],department=department)
+            items.append(item)
+        return render(request, 'users/hospital.html',
+                      {'username': request.user.username, 'hospital': hospital, 'location': location,'departments':departments,'items':items})
+    else:
+        return render(request,'users/hospital.html',{'username': request.user.username, 'hospital': hospital,'departments':departments})
+
 
 
 @login_required(login_url='login')

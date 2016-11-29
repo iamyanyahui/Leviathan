@@ -13,7 +13,7 @@ def addUser(form):
                                             telephone=data['telephone']
                                             , email=data['email'], name=data['name'], credit='A', gender=data['gender'],
                                             age=data['age']
-                                            , _createtime=datetime.datetime.now(), idcardnumber=data['idcardnumber'])
+                                            , createtime=datetime.datetime.now(), idcardnumber=data['idcardnumber'])
     patient.save()
     user = User.objects.create_user(form.cleaned_data['username'], form.cleaned_data['email'],
                                     form.cleaned_data['password'])
@@ -53,16 +53,14 @@ def getCities(province):
     return cities
 
 
-def getBulletins(hospital_id):
-    departments=models.Department.objects.filter(id_hospital=hospital_id)
+#查询特定医院，特定科室的预约信息
+def getBulletins(department_id):
     bulletins=[]
-    for department in departments:
-        doctor_departments=models.DoctorDepartment.objects.filter(id_department=department.id_department)
-        for doctor_department in doctor_departments:
-            finds = models.Bulletin.objects.filter(id_doctor_department=doctor_department.id_doctor_department)
-            for find in finds:
-                if find.availabletime > pytz.utc.localize(datetime.datetime.now()):
-                    bulletins.append(find)
+    doctor_departments=models.DoctorDepartment.objects.filter(id_department=department_id)
+    for doctor_department in doctor_departments:
+         find = models.Bulletin.objects.filter(id_doctor_department=doctor_department.id_doctor_department).first()
+         if find.availabletime > pytz.utc.localize(datetime.datetime.now()):
+            bulletins.append(find)
     return bulletins
 
 

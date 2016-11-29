@@ -7,9 +7,9 @@
 <body>
     {% if username %}
          你好，{{ username }}
-        <a href="{% url 'logout' %}">注销</a></br>
+        <a href="{% url 'users:logout' %}">注销</a></br>
     {% else %}
-        <a href="{%  url 'login' %}">登录</a></br>
+        <a href="{%  url 'users:login' %}">登录</a></br>
     {% endif %}
 
     选择省份</br>
@@ -26,7 +26,7 @@
     {% if hospitals %}
         </br>选择医院</br>
         {% for hospital in hospitals %}
-            <a href="{% url 'hospital' %}?hospital_id={{ hospital.id_hospital }}">{{ hospital.name }}</a>
+            <a href="{% url 'users:hospital' %}?hospital_id={{ hospital.id_hospital }}">{{ hospital.name }}</a>
         {% endfor %}
     {% endif %}
 </body>
