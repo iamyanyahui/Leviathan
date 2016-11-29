@@ -31,6 +31,7 @@ ALLOWED_HOSTS = [u'127.0.0.1',u'localhost']
 # Application definition
 
 INSTALLED_APPS = [
+    'publisher.apps.PublisherConfig',
     'users.apps.UsersConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -76,7 +77,7 @@ WSGI_APPLICATION = 'leviathan.wsgi.application'
 
 DATABASES = {
     'default': {
-	'ENGINE': 'django.db.backends.mysql',
+	    'ENGINE': 'django.db.backends.mysql',
         'NAME': 'leviathan',
         'USER': 'leviathan',
         'PASSWORD': 'passwd',
