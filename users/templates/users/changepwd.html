@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>修改密码</title>
+    <meta name="description" content="">
+    <meta name="author" content="zy">
+</head>
+
+<body>
+{% if oldpassword_is_wrong %}
+    <div class="alert alert-error">
+        <h4>错误!</h4>原密码不正确，请重新填写！
+    </div>
+{% endif %}
+{% if changepwd_success %}
+    <div class="alert alert-error">
+        <h4>修改成功！</h4>
+    </div>
+{% endif %}
+    <form action="" method="post">
+        <table>
+            {{ form.as_table }}
+        </table>
+        {% csrf_token %}
+        <input type="submit" value="确认修改">
+    </form>
+    <a href="{% url 'user:usercenter' %}">返回用户中心</a>
+</body>
+</html>

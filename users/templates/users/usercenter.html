@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户中心</title>
+    <h1>用户中心</h1>
+    <p>名字：{{ wholename }}</p>
+    <p>性别：{{ sex }}</p>
+    <p>年龄：{{ age }}</p>
+    <p>电话：{{ tel }}</p>
+    <p>电子邮箱：{{ mail }}</p>
+    <p>身份证号：{{ idcn }}</p>
+    <p>信用等级：{{ credit }}</p>
+    <a href="/">返回主页</a>
+    <a href="{% url 'user:viewa' %}">查看订单</a>
+    <a href="{% url 'user:changeinfo' %}">修改信息</a>
+{#    <a href=""></a>#}
+    <a href="{% url 'user:accountsafe' %}">账号安全</a>
+    <a href="{% url 'user:logout' %}">注销</a></br>
+</head>
+<body>
+
+</body>
+</html>

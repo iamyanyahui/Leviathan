@@ -3,6 +3,10 @@ from __future__ import unicode_literals
 
 from django.db import models
 
+# 如果没有pymysql可以直接注释掉下面两行
+import pymysql
+pymysql.install_as_MySQLdb()
+
 
 # Create your models here.
 class Patient(models.Model):
