@@ -20,7 +20,7 @@
     {% load static %}
     <img src="{% static hospital.picture %}"/></br>
 {% endif %}
-选择科室 </br>
+请先选择科室 </br>
 {% for department in departments %}
     <a href="?hospital_id={{ hospital.id_hospital }}&department_id={{ department.id_department }}">{{ department.name }}</a>
 {% endfor %} </br>
