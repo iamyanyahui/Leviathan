@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # 功能函数放置在此文件中
-from forms import RegisterForm, LoginForm
+from .forms import RegisterForm, LoginForm
 from . import models
 import datetime
 import pytz
@@ -92,3 +92,6 @@ def addAppointment(bulletin,username):
                                                   ,id_patient=patient,createtime=pytz.utc.localize(datetime.datetime.now()))
     appointment.save()
     return True
+
+def change_password(newpassword,username):
+    models.Patient.objects.filter(username=username).update(password=newpassword)

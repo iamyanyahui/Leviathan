@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from forms import RegisterForm, LoginForm
+from .forms import RegisterForm, LoginForm,ChangePWForm
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
@@ -147,3 +147,52 @@ def reservation(request):
             return HttpResponse('您已成功预约，无需重复预约')
     return render(request,'users/reservation.html',{'username':request.user.username
         ,'doctor':doctor,'bulletin':bulletin,'department':department})
+
+
+@login_required(login_url='login')
+def user_center(request):
+    username = request.user.username
+    # print(username)
+    # userhere = models.Patient.objects.filter(username='useruser').first()
+    # it should be :
+    userhere = models.Patient.objects.filter(username=username).first()
+    # print(userhere)
+    name = userhere.name
+    sex = userhere.gender
+    age = userhere.age
+    idcn = userhere.idcardnumber
+    tele = userhere.telephone
+    email = userhere.email
+    credit = userhere.credit
+    return render(request, 'users/usercenter.html', {'wholename': name, 'sex': sex, 'age': age,
+    'idcn':idcn,'tel':tele,'mail':email,'credit':credit
+    })
+
+@login_required(login_url='login')
+def change_info(request):
+    pass
+
+@login_required(login_url='login')
+def change_pw(request):
+    if request.method == 'GET':
+        form = ChangePWForm()
+        return render(request,'users/changepwd.html', {'form': form})
+    elif request.method == 'POST':
+        form = ChangePWForm(request.POST)
+        if form.is_valid():
+            username = request.user.username
+            oldpassword = request.POST.get('oldpassword', '')
+            user = authenticate(username=username, password=oldpassword)
+            if user is not None and user.is_active:
+                newpassword = request.POST.get('newpassword1', '')
+                utils.change_password(newpassword,username)
+                return render(request,'users/changepwd.html', {'changepwd_success': True})
+            else:
+                return render(request,'users/changepwd.html',
+                                         {'form': form, 'oldpassword_is_wrong': True})
+        else:
+            return render(request,'users/changepwd.html', {'form': form})
+
+@login_required(login_url='login')
+def view_appointment(request):
+    pass
