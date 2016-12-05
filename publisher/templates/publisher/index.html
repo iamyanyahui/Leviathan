@@ -10,37 +10,42 @@
     {% endif %}
     你好，{{ loginname }}
     <a href="{% url 'publisher:logout' %}">注销</a>
-    <table>
-        <th>
-            <td>编号</td>
-            <td>科室</td>
-            <td>医生</td>
-            <td>可预约时间</td>
-            <td>可预约数</td>
-            <td>已预约数</td>
-            <td>发布人</td>
-            <td>发布时间</td>
-            <td>预约费用</td>
-            <td>操作</td>
-        </th>
-        {% for item in bulletins %}
+    {% if blank_message %}
+        <h3>{{ blank_message }}</h3>
+    {% else %}
+        <table>
             <tr>
-                <td>{{ item.id_bulletin }}</td>
-                <td>{{ item.id_doctor_department.id_department.name }}</td>
-                <td>{{ item.id_doctor_department.id_doctor.name }}</td>
-                <td>{{ item.availabletime }}</td>
-                <td>{{ item.countavailable }}</td>
-                <td>{{ item.countoccupied }}</td>
-                <td>{{ item.id_adminpublisher.loginname }}</td>
-                <td>{{ item.createtime }}</td>
-                <td>{{ item.fee }}</td>
-                <td>
-                    <a href="{% url 'publisher:alter' item.id_bulletin %}">修改</a>&nbsp;&nbsp;
-                    <a href="{% url 'publisher:delete' item.id_bulletin %}">删除</a>
-                </td>
+                <td>编号</td>
+                <td>科室</td>
+                <td>医生</td>
+                <td>可预约时间</td>
+                <td>可预约数</td>
+                <td>已预约数</td>
+                <td>发布人</td>
+                <td>发布时间</td>
+                <td>预约费用</td>
+                <td>操作</td>
             </tr>
-        {% endfor %}
-    </table>
+            {% for item in bulletins %}
+                <tr>
+                    <td>{{ item.id_bulletin }}</td>
+                    <td>{{ item.id_doctor_department.id_department.name }}</td>
+                    <td>{{ item.id_doctor_department.id_doctor.name }}</td>
+                    <td>{{ item.availabletime }}</td>
+                    <td>{{ item.countavailable }}</td>
+                    <td>{{ item.countoccupied }}</td>
+                    <td>{{ item.id_adminpublisher.loginname }}</td>
+                    <td>{{ item.createtime }}</td>
+                    <td>{{ item.fee }}</td>
+                    <td>
+                        <a href="{% url 'publisher:alter' item.id_bulletin %}">修改</a>&nbsp;&nbsp;
+                        <a href="{% url 'publisher:delete' item.id_bulletin %}">删除</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+
 <a href="{% url 'publisher:create' %}">发布新的预约信息</a>
 <a href="{% url 'publisher:batchUpload' %}">批量发布新的预约信息</a>
 </body>

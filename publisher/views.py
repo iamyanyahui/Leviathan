@@ -46,7 +46,7 @@ def register(request):
                 return render(request, 'publisher/register.html', {'form': form, 'error_message': '用户名已存在!'})
             else:
                 utils.add_publisher(form)
-                return render(request, 'publisher/regsuccess.html')
+                return redirect('publisher/')
         else:
             form = RegisterForm()
             return render(request, 'publisher/register.html', {'form': form, 'error_message': '请输入正确信息!'})
@@ -60,6 +60,9 @@ def index(request):
     islogin = session.get('islogin', False)
     if islogin:
         bulletins = utils.select_all_bulletin(request.session['hospital_id'])
+        if not bulletins:
+            blank_message = '当前尚未发布任何预约信息！请及时发布！'
+            return render(request, 'publisher/index.html', {'loginname': session['loginname'], 'blank_message': blank_message})
         return render(request, 'publisher/index.html', {'loginname': session['loginname'], 'bulletins': bulletins})
     else:
         return redirect('/publisher/login/')
