@@ -8,6 +8,7 @@ urlpatterns = [
     url(r'^login/$', views.login, name='login'),
     url(r'^logout/$', views.logout, name='logout'),
     url(r'register/$', views.register, name='register'),
+    url(r'success/$', views.success, name='success'),
     url(r'create_bulletin/$', views.create_bulletin, name='create'),
     url(r'alter_bulletin/$', views.alter_bulletin, name='alter_bulletin'),
     url(r'^delete/(?P<bulletin_id>\d+)/$', views.delete_bulletin, name='delete'),

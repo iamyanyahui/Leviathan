@@ -126,6 +126,9 @@
 									<span class="caption-subject font-green-sharp bold uppercase">选择预约信息批量发布</span>
 								</div>
 							</div>
+                            {% if error_message %}
+                                <div id="error_message" style="color: red;font-family: 等线;font-size: 20px;">{{ error_message }}</div>
+                            {% endif %}
 							<div class="portlet-body">
 								<form id="fileupload" method="POST" enctype="multipart/form-data">
 								<!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
@@ -218,27 +221,3 @@ jQuery(document).ready(function() {
 </body>
 <!-- END BODY -->
 </html>
-
-
-
-
-{#<!DOCTYPE html>#}
-{#<html lang="en">#}
-{#<head>#}
-{#    <meta charset="UTF-8">#}
-{#    <title>测试文件</title>#}
-{#</head>#}
-{#<body>#}
-{#    {% if error_message  %}#}
-{#        {{ error_message }}#}
-{#    {% endif %}#}
-{#    <form action="" method="post" enctype="multipart/form-data">#}
-{#        <table>#}
-{#            {{ form.as_table }}#}
-{#        </table>#}
-{#        {% csrf_token %}#}
-{#        <input type="submit" value="上传"></br>#}
-{#    </form>#}
-{#    <a href="{% url 'publisher:index' %}">查看已发布的信息列表</a>#}
-{#</body>#}
-{#</html>#}

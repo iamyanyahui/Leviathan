@@ -35,6 +35,10 @@ def logout(request):
     return redirect('/publisher/login/')
 
 
+def success(request):
+    return render(request, 'publisher/regsuccess.html')
+
+
 def register(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
