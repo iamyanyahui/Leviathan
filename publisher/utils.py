@@ -6,7 +6,6 @@ from users import models
 import datetime
 from openpyxl.reader.excel import load_workbook
 import os
-from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 
 
 def add_publisher(form):
@@ -159,22 +158,10 @@ def _get_id_doctor_department(request, dept_name, dt_name):
     import sys
     reload(sys)
     sys.setdefaultencoding('utf-8')
-    # try:
     doc_dept = models.DoctorDepartment.objects.get(id_department__name=dept_name,
                                                    id_department__id_hospital_id=request.session['hospital_id'],
                                                    id_doctor__name=dt_name)
-    #print(doc_dept)
     return doc_dept.id_doctor_department
-    # except MultipleObjectsReturned, e:
-    #     print('科室：%s,医生：%s组合不止一个！' % (dept_name, dt_name))
-    #     print e
-    #     raise RuntimeError
-    #     #return None
-    # except ObjectDoesNotExist, e:
-    #     print('不存在科室：%s,医生：%s组合！' % (dept_name, dt_name))
-    #     print e
-    #     raise RuntimeError
-    #     return None
 
 
 def isItemRepeated(_id_doctor_department,_availabletime):
