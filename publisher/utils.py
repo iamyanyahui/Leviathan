@@ -17,6 +17,7 @@ def add_publisher(form):
                                                      email=data['email'],
                                                      createtime=datetime.datetime.now(),
                                                      id_hospital_id=data['hospital'])
+    publisher.save()
 
 
 def auth_publisher(form):
@@ -54,6 +55,135 @@ def select_all_bulletin(hospital_id):
     return bulletins
 
 
+def get_publisher_info(_loginname):
+    '''
+    :param _loginname:
+    :return: id_hospital and id_adminpubisher given pulisher's logining name
+    '''
+    ids = models.Adminpublisher.objects.filter(loginname=_loginname).values('id_hospital_id', 'id_adminpublisher')
+    id_hospital = 0
+    id_adminpublisher = 0
+    for id in ids:
+        id_hospital = id['id_hospital_id']
+        id_adminpublisher = id['id_adminpublisher']
+    return (id_hospital,id_adminpublisher)
+
+
+def get_doctor_info(_doctor_id):
+    '''
+    :param _doctor_id:
+    :return: id_doctor_department given doctor_id
+    '''
+    id_doctor_department = 0
+    ids = models.DoctorDepartment.objects.filter(id_doctor_id=_doctor_id).\
+        values('id_doctor_department')
+    for id in ids:
+        id_doctor_department = id['id_doctor_department']
+    return id_doctor_department
+
+
+# def datetimeShift(date_time) :
+#     date = date_time.split(' ')
+#     hour = 0
+#     minute = 0
+#     second = 0
+#     time = date[3].split(':')
+#     if date[-1] == 'noon':
+#         hour = 12
+#     elif date[-1] == 'p.m.':
+#         hour = 12 + int(time[0])
+#     elif date[-1] == 'midnight' :
+#         hour = 0
+#     else :
+#         hour = int(time[0])
+#     if len(time)>1 :
+#         minute = int(time[1])
+#     if len(time)>2 :
+#         second = int(time[2])
+#     date_time = date[0]+date[1]+date[2]+str(hour)+':'+str(minute)+':'+str(second)
+#     return datetime.datetime.strptime(date_time,'%b.%d,%Y,%H:%M:%S')
+
+
+# def getDepartments(hospital_id):
+#     apartment_list = models.Department.objects.filter(id_hospital_id=hospital_id).\
+#         values_list('id_department', 'name')
+#     return list(apartment_list)
+#
+#
+# def getDoctors(hospital_id):
+#     doctor_list = models.DoctorDepartment.objects.filter(id_department__id_hospital_id=hospital_id).\
+#         values_list('id_doctor_id', 'id_doctor__name')
+#     return list(doctor_list)
+
+def getDepartments():
+    apartment_list = models.Department.objects.all().\
+        values_list('id_department', 'name')
+    return apartment_list
+
+
+def getDoctors():
+    doctor_list = models.DoctorDepartment.objects.all().\
+        values_list('id_doctor_id', 'id_doctor__name')
+    return doctor_list
+
+
+def create_bulletin(form,session):
+    data = form.cleaned_data
+    appointment = models.Bulletin.objects.create(createtime=datetime.datetime.now(),
+                                                 availabletime=data['available_time'],
+                                                 fee=data['fee'],
+                                                 countavailable=data['count_available'],
+                                                 countoccupied=data['count_occupied'],
+                                                 id_adminpublisher_id=session.get('publisher_id'),
+                                                 id_doctor_department_id=get_doctor_info(data['doctor']))
+    appointment.save()
+
+
+def alter_bulletin(form,session):
+    data = form.cleaned_data
+    models.Bulletin.objects.filter(id_bulletin=session['id_bulletin']).update\
+        (createtime=datetime.datetime.now(),
+         # availabletime=datetimeShift(data['available_time']),
+         availabletime=data['available_time'],
+         fee=data['fee'],
+         countavailable=data['count_available'],
+         countoccupied=data['count_occupied'],
+         id_adminpublisher_id=session.get('publisher_id'),
+         id_doctor_department_id=get_doctor_info(data['doctor']))
+
+
+# def handle_uploaded_file(request, f=None):
+#     datenow = datetime.datetime.now()
+#     filedate = datenow.strftime('%Y%m%d-%H%M%S')
+#     path = os.path.join(os.path.abspath('.'),'publisher','fileUpload')
+#     filepath = path + '/' + filedate + '_' + f.name
+#     with open(filepath, 'ab') as de:
+#         for chunk in f.chunks():
+#             de.write(chunk)
+#     wb = load_workbook(filepath)
+#     print(filepath)
+#     table = wb.get_sheet_by_name(wb.get_sheet_names()[0])
+#     # print table.max_row
+#     # print table.max_column
+#     bulletin_list = []
+#     for i in range(2, table.max_row + 1):
+#         if table.cell(row=i, column=1).value is None:
+#             # print '科室为空，应跳过'
+#             continue
+#         print('正在导入第' + str(i - 1) + '行...')
+#         bulletin = models.Bulletin(
+#             availabletime=table.cell(row=i, column=3).value,
+#             countavailable=table.cell(row=i, column=4).value,
+#             countoccupied=table.cell(row=i, column=5).value,
+#             fee=table.cell(row=i, column=6).value,
+#             createtime=datetime.datetime.now(),
+#             id_adminpublisher_id=request.session['publisher_id'],
+#             id_doctor_department_id=_get_id_doctor_department(request, dept_name=table.cell(row=i, column=1).value, dt_name=table.cell(row=i, column=2).value)
+#         )
+#         bulletin_list.append(bulletin)
+#     models.Bulletin.objects.bulk_create(bulletin_list)
+    #print(bulletin_list)
+
 def handle_uploaded_file(request, f=None):
     datenow = datetime.datetime.now()
     filedate = datenow.strftime('%Y%m%d-%H%M%S')
@@ -63,7 +193,7 @@ def handle_uploaded_file(request, f=None):
         for chunk in f.chunks():
             de.write(chunk)
     wb = load_workbook(filepath)
-    print filepath
+    print(filepath)
     table = wb.get_sheet_by_name(wb.get_sheet_names()[0])
     # print table.max_row
     # print table.max_column
@@ -72,19 +202,25 @@ def handle_uploaded_file(request, f=None):
         if table.cell(row=i, column=1).value is None:
             # print '科室为空，应跳过'
             continue
-        print '正在导入第' + str(i - 1) + '行...'
+        print('正在导入第' + str(i - 1) + '行...')
+
+        _id_doctor_department = _get_id_doctor_department(request, dept_name=table.cell(row=i, column=1).\
+                                                          value, dt_name=table.cell(row=i, column=2).value)
+        _availabletime = table.cell(row=i, column=3).value
+        #数据库已存在相同的预约发布信息，应跳过
+        if isItemRepeated(_id_doctor_department,_availabletime):
+            continue
         bulletin = models.Bulletin(
-            availabletime=table.cell(row=i, column=3).value,
+            availabletime=_availabletime,
             countavailable=table.cell(row=i, column=4).value,
             countoccupied=table.cell(row=i, column=5).value,
             fee=table.cell(row=i, column=6).value,
             createtime=datetime.datetime.now(),
-            id_adminpublisher_id=1,
-            id_doctor_department_id=_get_id_doctor_department(request, dept_name=table.cell(row=i, column=1).value, dt_name=table.cell(row=i, column=2).value)
+            id_adminpublisher_id=request.session['publisher_id'],
+            id_doctor_department_id=_id_doctor_department
         )
         bulletin_list.append(bulletin)
     models.Bulletin.objects.bulk_create(bulletin_list)
-    print bulletin_list
 
 
 def _get_id_doctor_department(request, dept_name, dt_name):
@@ -95,7 +231,7 @@ def _get_id_doctor_department(request, dept_name, dt_name):
         doc_dept = models.DoctorDepartment.objects.get(id_department__name=dept_name,
                                                        id_department__id_hospital_id=request.session['hospital_id'],
                                                        id_doctor__name=dt_name)
-        print doc_dept
+        #print(doc_dept)
         return doc_dept.id_doctor_department
     except MultipleObjectsReturned, e:
         print('科室：%s,医生：%s组合不止一个！' % (dept_name, dt_name))
@@ -107,3 +243,12 @@ def _get_id_doctor_department(request, dept_name, dt_name):
         print e
         raise RuntimeError
         return None
+
+
+def isItemRepeated(_id_doctor_department,_availabletime):
+    all_availabetime = models.Bulletin.objects.filter(id_doctor_department=_id_doctor_department).values('availabletime')
+    for availabletime in all_availabetime:
+        availabletime = str(availabletime['availabletime']+datetime.timedelta(hours=8))[0:-6]
+        if availabletime == str(_availabletime):
+            return True
+    return False
