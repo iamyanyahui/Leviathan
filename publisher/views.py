@@ -8,7 +8,7 @@ from openpyxl.reader.excel import load_workbook
 from django.db import models
 from users import models
 import datetime
-
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 
 # Create your views here.
 def login(request):
@@ -20,7 +20,7 @@ def login(request):
             request.session['loginname'] = form.cleaned_data['loginname']
             request.session['publisher_id'] = publisher[0].id_adminpublisher
             request.session['hospital_id'] = publisher[0].id_hospital_id
-            request.session.set_expiry(600)
+            request.session.set_expiry(3600)
             return redirect('/publisher')
         else:
             form = LoginForm()
@@ -75,7 +75,7 @@ def index(request):
 def alter_bulletin(request):
     if request.method == 'POST' :
         session = request.session
-        form = BulletinForm(request.POST)
+        form = BulletinForm(request.POST, hospital_id=session['hospital_id'])
         if form.is_valid():
             utils.alter_bulletin(form, session)
             return redirect('/publisher/',isAlter=True)
@@ -88,7 +88,7 @@ def alter_bulletin(request):
         countoccupied = request.GET.get('countoccupied', -1)
         department = request.GET.get('department',-1)
         doctor = request.GET.get('doctor',-1)
-        form = BulletinForm()
+        form = BulletinForm(hospital_id=session['hospital_id'])
         return render(request, 'publisher/bulletin.html', {'loginname': session['loginname'],
                                                            'form': form,
                                                           'fee': fee,
@@ -106,29 +106,6 @@ def delete_bulletin(request, bulletin_id):
 
 
 # 发布预约信息
-
-# def create_bulletin(request):
-#     session = request.session
-#     islogin = session.get('islogin', False)
-#     if not islogin:
-#         return redirect('/publisher/login')
-#     if request.method == 'POST':
-#         session = request.session
-#         form = BulletinForm(request.POST, hospital_id=session['hospital_id'])
-#         if form.is_valid():
-#             utils.create_bulletin(form,session)
-#             return redirect('/publisher/', isCreate=True)
-#         else:
-#             print form.fields['department'].widget.choices
-#             print form.fields['doctor'].widget.choices
-#             print '\n'
-#             for field in form:
-#                 print field.name
-#                 print field.errors
-#     else:
-#         form= BulletinForm(hospital_id=session['hospital_id'])
-#         return render(request, 'publisher/bulletin.html', {'loginname': request.session['loginname'], 'form': form})
-
 def create_bulletin(request):
     session = request.session
     islogin = session.get('islogin', False)
@@ -136,16 +113,17 @@ def create_bulletin(request):
         return redirect('/publisher/login')
     if request.method == 'POST':
         session = request.session
-        form = BulletinForm(request.POST)
-
-        print form.fields['department'].widget.choices
-        print form.fields['doctor'].widget.choices
-
+        form = BulletinForm(request.POST, hospital_id=session['hospital_id'])
         if form.is_valid():
             utils.create_bulletin(form,session)
-            return redirect('/publisher/',isCreate=True)
+            return redirect('/publisher/', isCreate=True)
+        else:
+            error_message = '您填写的信息有错误，请重新填写！'
+            return render(request, 'publisher/bulletin.html',
+                          {'loginname': request.session['loginname'],
+                           'form': form, 'error_message': error_message})
     else:
-        form= BulletinForm()
+        form= BulletinForm(hospital_id=session['hospital_id'])
         return render(request, 'publisher/bulletin.html', {'loginname': request.session['loginname'], 'form': form})
 
 
@@ -154,8 +132,16 @@ def batch_import_bulletin_by_excel(request):
         form = FileForm(request.POST, request.FILES)
         if form.is_valid():
             if request.FILES['filefield'].name.split('.')[-1] == 'xlsx':
-                utils.handle_uploaded_file(request, f=request.FILES['filefield'])
-                return render(request, 'publisher/file.html', {'form': form, 'error_message': '上传成功！', 'loginname': request.session['loginname']})
+                try:
+                    utils.handle_uploaded_file(request, f=request.FILES['filefield'])
+                except ObjectDoesNotExist, e:
+                    error_message = '科室和医生组合不存在，请检查所上传表格内容后重新上传'
+                    return render(request, 'publisher/file.html',
+                                  {'form': form, 'error_message': error_message,
+                                   'loginname': request.session['loginname']})
+                return render(request, 'publisher/file.html',
+                              {'form': form, 'error_message': '上传成功！',
+                               'loginname': request.session['loginname']})
             else:
                 error_message = '文件格式错误，请上传Excel文件（.xlsl)'
                 form = FileForm()
