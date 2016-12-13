@@ -9,6 +9,7 @@ from django.db import models
 from users import models
 import datetime
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
+import json
 
 # Create your views here.
 def login(request):
@@ -73,12 +74,12 @@ def index(request):
 
 #修改预约信息
 def alter_bulletin(request):
-    if request.method == 'POST' :
+    if request.method == 'POST':
         session = request.session
         form = BulletinForm(request.POST, hospital_id=session['hospital_id'])
         if form.is_valid():
             utils.alter_bulletin(form, session)
-            return redirect('/publisher/',isAlter=True)
+            return redirect('/publisher/')
     else:
         session = request.session
         session['id_bulletin'] = request.GET.get('id_bulletin',-1)
@@ -96,7 +97,10 @@ def alter_bulletin(request):
                                                           'countavailable': countavailable,
                                                           'countoccupied': countoccupied,
                                                           'department': department,
-                                                          'doctor': doctor})
+                                                          'doctor': doctor,
+                                                          'doctor_department': json.dumps(utils.get_doctor_department(
+                                                               session['hospital_id']))
+                                                           })
 
 
 # 删除预约信息
@@ -116,15 +120,22 @@ def create_bulletin(request):
         form = BulletinForm(request.POST, hospital_id=session['hospital_id'])
         if form.is_valid():
             utils.create_bulletin(form,session)
-            return redirect('/publisher/', isCreate=True)
+            return redirect('/publisher/')
         else:
             error_message = '您填写的信息有错误，请重新填写！'
             return render(request, 'publisher/bulletin.html',
                           {'loginname': request.session['loginname'],
-                           'form': form, 'error_message': error_message})
+                           'form': form, 'error_message': error_message,
+                           'doctor_department': json.dumps(utils.get_doctor_department(
+                               session['hospital_id']))
+                           })
     else:
         form= BulletinForm(hospital_id=session['hospital_id'])
-        return render(request, 'publisher/bulletin.html', {'loginname': request.session['loginname'], 'form': form})
+        return render(request, 'publisher/bulletin.html',
+                      {'loginname': request.session['loginname'],
+                       'form': form,
+                       'doctor_department': json.dumps(utils.get_doctor_department(session['hospital_id']))
+                     })
 
 
 def batch_import_bulletin_by_excel(request):

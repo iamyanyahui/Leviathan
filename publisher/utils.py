@@ -92,6 +92,21 @@ def getDoctors(hospital_id):
         values_list('id_doctor_id', 'id_doctor__name')
     return list(doctor_list)
 
+def get_doctor_department(id_hospital):
+    '''
+    :param id_hospital:
+    :return: a dictionary where the key is the name of department and its
+            corresponding value is a list containing the name of doctors in
+            the department when given id_hospital
+    '''
+    departments = {};
+    doctor_department = models.DoctorDepartment.objects.filter(id_department__id_hospital=id_hospital).\
+        values_list('id_department__name','id_doctor_id','id_doctor__name')
+    for item in doctor_department:
+        if item[0] not in departments:
+            departments[item[0]] = []
+        departments[item[0]].append([item[1],item[2]])
+    return departments
 
 def create_bulletin(form,session):
     data = form.cleaned_data

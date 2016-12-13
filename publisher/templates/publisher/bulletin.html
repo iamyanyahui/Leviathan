@@ -207,7 +207,7 @@
 													<div class="row">
 														<div class="col-md-offset-3 col-md-9">
                                                             {% csrf_token %}
-															<button type="submit" class="btn btn-circle blue">提交</button>
+															<button id="submit-button" type="submit" class="btn btn-circle blue">提交</button>
 {#															<button type="button" class="btn btn-circle default">取消</button>#}
 														</div>
 													</div>
@@ -260,12 +260,20 @@
 <!-- END PAGE LEVEL SCRIPTS -->
 <script>
     //data-date="2016-12-21T15:25:00Z"
-    function getTimeToShow(){
+    function getTimeToShow() {
         var timeToShow = new Date().toISOString();
-        if('{{ availabletime}}'){
+        if ('{{ availabletime}}') {
             timeToShow = '{{ availabletime}}';
         }
         return timeToShow;
+    }
+    function initSelector(){
+        var department_selector = $('#id_department');
+        var doctor_selector = $('#id_doctor');
+        var department_option = '<option value="-1" selected>==请选择科室==</option>';
+        var doctor_option = '<option value="-1" selected>==请选择医生==</option>';
+        department_selector.prepend(department_option);
+        doctor_selector.prepend(doctor_option);
     }
     $(function(){
         var form_input = $('form input');
@@ -283,6 +291,15 @@
         form_select.attr('date-placeholder', '选择...');
 
         $('#datetimepicker').datetimepicker('setStartDate', getTimeToShow());
+        initSelector();
+    });
+
+    $('#submit-button').click(function(){
+        if($('#id_department option:selected').val()==-1){
+            alert('请选择科室！');
+            return false;
+        }
+        return true;
     });
 jQuery(document).ready(function() {
            // initiate layout and plugins
@@ -292,6 +309,22 @@ jQuery(document).ready(function() {
     ComponentsPickers.init();
         });
 
+
+	var doctor_department = {{ doctor_department|safe }};
+	var department_selector = document.getElementById('id_department');
+	var doctor_selector = document.getElementById("id_doctor");
+
+	function fill_options(selector,data)
+	{
+		for(var i = 0;i < data.length;i++)
+		{
+			var option = document.createElement('option'); //create option tags
+			option.value = data[i][0];
+			var textNode = document.createTextNode(data[i][1]);
+			option.appendChild(textNode);
+			selector.appendChild(option);
+		}
+	}
 
 	function set_selector(text,id)
 	{
@@ -307,16 +340,26 @@ jQuery(document).ready(function() {
 			}
 		}
 	}
-	function myfun()
+	function auto_fill_form()
 	{
-		document.getElementById('id_fee').value='{{ fee }}';
-		document.getElementById('id_available_time').value='{{ availabletime}}';
-		document.getElementById('id_count_available').value='{{ countavailable }}';
-		document.getElementById('id_count_occupied').value='{{ countoccupied }}';
+		document.getElementById('id_fee').value="{{ fee }}";
+		document.getElementById('id_available_time').value="{{ availabletime }}";
+		document.getElementById('id_count_available').value="{{ countavailable }}";
+		document.getElementById('id_count_occupied').value="{{ countoccupied }}";
 		set_selector("{{ department }}","id_department");
 		set_selector("{{ doctor }}","id_doctor");
 	}
-	window.onload=myfun;
+	window.onload = auto_fill_form;
+
+	department_selector.onchange = function()
+	{
+		doctor_selector.options.length = 0;
+		var department_index = this.selectedIndex;
+		var department_name = this.options[department_index].text;
+		doctors = doctor_department[department_name];
+		fill_options(doctor_selector,doctors);
+	}
+
 
 </script>
 <!-- END JAVASCRIPTS -->
